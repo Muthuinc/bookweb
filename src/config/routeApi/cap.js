@@ -12,14 +12,6 @@ const getEmployeesData = async () => {
   return await restaurantCapAxiosInstance.get(`getAllcustomerDetailsCap`);
 };
 
-// Get all the employees
-const getAllRegisteredPosCap = async () => {
-  try {
-    return await restaurantCapAxiosInstance.get("getAllRegisteredCapPos");
-  } catch (err) {
-    console.log(err);
-  }
-};
 
 export const capDashboard = async (data) => {
   try {
@@ -32,6 +24,7 @@ export const capDashboard = async (data) => {
 const BookTable = async (data) => {
   // console.log(data,"i am booked");
   try {
+
     const response = await restaurantCapAxiosInstance.post(
       "tableBooking",
       data
@@ -52,9 +45,7 @@ const TableStatus = async () => {
 };
 export const TableDetails = async (tableId) => {
   try {
-    const response = await restaurantCapAxiosInstance.get(
-      `TableDetailsByID/${tableId}`
-    );
+    const response = await restaurantCapAxiosInstance.get(`TableDetailsByID/${tableId}`);
     return response;
   } catch (error) {
     console.log(error);
@@ -203,5 +194,4 @@ export {
   DeleteLeadDataAtCap,
   UpdateLeadsAtCap,
   GetToEditLeadAtCap,
-  getAllRegisteredPosCap,
 };

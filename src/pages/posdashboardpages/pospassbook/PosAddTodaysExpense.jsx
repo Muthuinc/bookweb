@@ -15,8 +15,6 @@ const PosAddTodaysExpense = () => {
   const [isUploading, setUploading] = useState(false);
   const [imagePreview, setImagePreview] = useState(null);
 
-  const currentDate = new Date().toISOString().split("T")[0];
-
   const {
     register,
     handleSubmit,
@@ -26,10 +24,11 @@ const PosAddTodaysExpense = () => {
   const navigate = useNavigate();
 
   const handleSubmitButton = async (data) => {
-    setUploading(true);
+
+    setUploading(true)
 
     const formData = new FormData();
-    const { totalAmount, date, description } = data;
+    const { totalAmount, date, description } = data
     formData.append("image", image);
     formData.append("amount", totalAmount);
     formData.append("date", date);
@@ -40,38 +39,43 @@ const PosAddTodaysExpense = () => {
       formData,
       {
         headers: {
-          "Content-Type": "multipart/form-data",
+          'Content-Type': 'multipart/form-data',
         },
       }
     );
-    setUploading(false);
+    setUploading(false)
     if (response.data.success) {
-      navigate("/pos-dashboard/pos-passbook/todays-expense");
-      toastSuccess(response.data.message);
+      toastSuccess(response.data.message)
+
     } else {
-      toastError(response.data.message);
+      toastError(response.data.message)
+
     }
+
+
+
   };
 
   const handleImage = (e) => {
     const image = e.target.files[0];
     if (image) {
       const reader = new FileReader();
-
+      
       reader.onload = function (e) {
         setImagePreview(e.target.result);
       };
-
+      
       reader.readAsDataURL(image);
       setImage(image);
     }
-
+    
     setImage(image);
   };
 
   return (
+
     <>
-      {isUploading ? <Uploading isUploading={isUploading} /> : null}
+      {isUploading ? (<Uploading isUploading={isUploading} />) : null}
 
       <Wrapper className="page">
         <div className="page-content">
@@ -81,31 +85,29 @@ const PosAddTodaysExpense = () => {
 
           <div className="custom-form">
             <form onSubmit={handleSubmit(handleSubmitButton)}>
+
               <div className="form-input-row">
                 <div className="form-input-full">
-                  <label>
-                    Date<span className="text-danger">*</span>
-                  </label>
+                  <label>Date<span className="text-danger">*</span></label>
                   <br />
                   <input
                     {...register("date", { required: true })}
                     type="date"
                     id="date"
-                    defaultValue={currentDate}
-                    readOnly
                   />
                   {errors.date && errors.date.type === "required" && (
                     <label className="error-msg text-danger">
                       Please enter date
+
                     </label>
                   )}
                 </div>
+
+
               </div>
               <div className="form-input-row">
                 <div className="form-input">
-                  <label>
-                    Amount<span className="text-danger">*</span>
-                  </label>
+                  <label>Amount<span className="text-danger">*</span></label>
                   <br />
                   <input
                     {...register("totalAmount", { required: true })}
@@ -116,15 +118,14 @@ const PosAddTodaysExpense = () => {
                   {errors.totalAmount &&
                     errors.totalAmount.type === "required" && (
                       <label className="error-msg text-danger">
-                        Please enter amount
+                        Please enter  amount
                       </label>
                     )}
                 </div>
 
+
                 <div className="form-input">
-                  <label>
-                    Description<span className="text-danger">*</span>
-                  </label>
+                  <label>Description<span className="text-danger">*</span></label>
                   <br />
                   <input
                     {...register("description", { required: true })}
@@ -139,13 +140,15 @@ const PosAddTodaysExpense = () => {
                       </label>
                     )}
                 </div>
+
+
               </div>
+
+
 
               <div className="form-input-row">
                 <div className="form-input-full">
-                  <label htmlFor="uploads">
-                    Upload a Copy<span className="text-danger">*</span>
-                  </label>
+                  <label htmlFor="uploads" >Upload a Copy<span className="text-danger">*</span></label>
                   <br />
                   <label htmlFor="uploads" className="file-upload">
                     <input
@@ -155,28 +158,22 @@ const PosAddTodaysExpense = () => {
                       onChange={handleImage}
                       placeholder="Please Upload a Copy"
                     />
-                    <span className="upload-icon">
-                      <FaUpload />
-                    </span>
-                    <label htmlFor="uploads" className="browse-btn">
-                      Browse File
-                    </label>
+                    <span className="upload-icon" ><FaUpload /></span>
+                    <label htmlFor="uploads" className="browse-btn">Browse File</label>
                   </label>
-                  {!imagePreview &&
-                    errors.uploads &&
-                    errors.uploads.type === "required" && (
-                      <label className="error-msg text-danger">
-                        Please Upload the Copy
-                      </label>
-                    )}
+                  {!imagePreview && errors.uploads && errors.uploads.type === "required" && (
+                    <label className="error-msg text-danger">
+                      Please Upload the Copy
+                    </label>
+                  )}
                 </div>
               </div>
 
               {imagePreview && (
-                <div className="col-md-5 mt-3">
-                  <Image width={200} src={imagePreview} />
-                </div>
-              )}
+                  <div className="col-md-5 mt-3">
+                    <Image width={200} src={imagePreview} />
+                  </div>
+                )}
 
               <div className="buttons">
                 <Button className="submit-btn" type="submit">

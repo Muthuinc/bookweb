@@ -8,15 +8,30 @@ import { toastError, toastSuccess } from "../../../helpers/helpers";
 import Uploading from "../../../components/loaders/Uploading";
 
 const PosAddTodaysOpeningBalance = () => {
+  //backend integration code
   const navigate = useNavigate();
   const [isUploading, setUploading] = useState(false);
-  const currentDate = new Date().toISOString().split("T")[0];
-  const [denominationCounts, setDenominationCounts] = useState({});
-  
-  // Define completeDenominationState and initialize it
-  const [completeDenominationState, setCompleteDenominationState] = useState([]);
 
-  // Define denominations array within the component scope
+  const currentDate = new Date().toISOString().split("T")[0];
+
+  const handleSubmitButton = async (data) => {
+    setUploading(true);
+
+    data.cashDenomination = completeDenominationState;
+    const response = await restaurantPosAxiosInstance.post(
+      `addTodaysOpeningBalance`,
+      data
+    );
+    setUploading(false);
+
+    if (response.data.success) {
+      navigate("/pos-dashboard/pos-passbook");
+      toastSuccess(response.data.message);
+    } else {
+      toastError(response.data.message);
+    }
+  };
+
   const denominations = [
     { value: 2000, label: "Rs 2000" },
     { value: 500, label: "Rs 500" },
@@ -30,40 +45,7 @@ const PosAddTodaysOpeningBalance = () => {
     { value: 1, label: "Rs 1" },
   ];
 
-  // Calculate total amount based on denomination counts
-  const totalAmount = Object.keys(denominationCounts).reduce(
-    (acc, label) => acc + (denominationCounts[label] || 0) * parseInt(label.replace(/\D/g, ""), 10),
-    0
-  );
-
-  const handleSubmitButton = async (formData) => {
-    setUploading(true);
-  
-    const data = {
-      ...formData,
-      totalAmount: totalAmount // Include total amount in the data object
-    };
-  
-    data.cashDenomination = completeDenominationState;
-  
-    try {
-      const response = await restaurantPosAxiosInstance.post(
-        `addTodaysOpeningBalance`,
-        data
-      );
-
-      if (response.data.success) {
-        navigate("/pos-dashboard/pos-passbook");
-        toastSuccess(response.data.message);
-      } else {
-        toastError(response.data.message);
-      }
-    } catch (error) {
-      toastError("An error occurred while submitting the form.");
-    }
-
-    setUploading(false);
-  };
+  const [denominationCounts, setDenominationCounts] = useState({});
 
   const updateQuantity = (denomination, action) => {
     setDenominationCounts((prevCounts) => {
@@ -79,6 +61,19 @@ const PosAddTodaysOpeningBalance = () => {
     });
   };
 
+  const completeDenomination = () => {
+    return denominations.map((denomination) => ({
+      label: denomination.label,
+      count: denominationCounts[denomination.label] || 0,
+    }));
+  };
+
+  const [completeDenominationState, setCompleteDenominationState] = useState(
+    completeDenomination()
+  );
+  const updateCompleteDenominationState = () => {
+    setCompleteDenominationState(completeDenomination());
+  };
   const {
     register,
     handleSubmit,
@@ -101,13 +96,13 @@ const PosAddTodaysOpeningBalance = () => {
                   <label>
                     Date<span className="text-danger">*</span>
                   </label>
+
                   <br />
                   <input
                     {...register("date", { required: true })}
                     type="date"
                     id="date"
                     defaultValue={currentDate}
-                    readOnly
                   />
                   {errors.date && errors.date.type === "required" && (
                     <label className="error-msg text-danger">
@@ -122,10 +117,17 @@ const PosAddTodaysOpeningBalance = () => {
                   </label>
                   <br />
                   <input
-                    type="text"
-                    value={`Rs ${totalAmount}`}
-                    readOnly
+                    {...register("totalAmount", { required: true })}
+                    type="number"
+                    id="totalAmount"
+                    placeholder="Enter Total amount"
                   />
+                  {errors.totalAmount &&
+                    errors.totalAmount.type === "required" && (
+                      <label className="error-msg text-danger">
+                        Please enter total amount
+                      </label>
+                    )}
                 </div>
               </div>
 
@@ -149,6 +151,7 @@ const PosAddTodaysOpeningBalance = () => {
                             className="prepend-btn"
                             onClick={() => {
                               updateQuantity(denomination, "decrease");
+                              updateCompleteDenominationState();
                             }}
                           >
                             -
@@ -174,6 +177,7 @@ const PosAddTodaysOpeningBalance = () => {
                             className="append-btn"
                             onClick={() => {
                               updateQuantity(denomination, "increase");
+                              updateCompleteDenominationState();
                             }}
                           >
                             +

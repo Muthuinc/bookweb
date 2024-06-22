@@ -17,7 +17,6 @@ import Wrapper1 from "../../assets/wrappers/poswrappers/PosFormModal";
 import { IoMdPrint } from "react-icons/io";
 import { toastError, toastSuccess } from "../../helpers/helpers";
 import Uploading from "../../components/loaders/Uploading";
-import TakeAwaySummeryModal from "../../components/poscomponents/TakeAwaySummeryModal.jsx";
 
 const PosMenu = () => {
   const [modalKot, setModalKot] = useState(false);
@@ -40,11 +39,11 @@ const PosMenu = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [orderMode, setOrderMode] = useState("");
   const location = useLocation();
-  console.log("location", location);
   const { orderData, HoldMenu } = location.state || {};
   const navigate = useNavigate();
 
-  console.log(HoldMenu, " holdmenu");
+
+  console.log(HoldMenu," holdmenu");
 
   const handleTotalPrice = (total) => {
     setTotalPrice(total);
@@ -54,9 +53,9 @@ const PosMenu = () => {
     setSearchTerm(event.target.value);
   };
 
-  // const handleKotIdChange = (newKotId) => {
-  //   setKotId(newKotId);
-  // };
+  const handleKotIdChange = (newKotId) => {
+    setKotId(newKotId);
+  };
 
   const handleModalKotOpen = () => {
     if (selectedItems.filter((item) => item.quantity > 0).length === 0) {
@@ -66,11 +65,16 @@ const PosMenu = () => {
     }
   };
 
-  const filterMenu = (menu) => {
-    const sortedMenu = [...menu];
+  
 
+  const filterMenu = (menu) => {
+
+    const sortedMenu = [...menu]; 
+
+   
     sortedMenu.sort((a, b) => {
-      const priceA = a.discountPrice || a.actualPrice;
+
+      const priceA = a.discountPrice || a.actualPrice; 
       const priceB = b.discountPrice || b.actualPrice;
 
       if (selectedSortOption === "low to high") {
@@ -78,8 +82,9 @@ const PosMenu = () => {
       } else if (selectedSortOption === "high to low") {
         return priceB - priceA;
       } else {
-        return 0;
+        return 0; 
       }
+
     });
 
     return sortedMenu.filter((item) => {
@@ -105,27 +110,7 @@ const PosMenu = () => {
     }
   }, []);
 
-  const calculateTotalOrderAmount = (selectedItems) => {
-    let totalAmount = 0;
-
-    selectedItems.forEach((item) => {
-      // Check if discount price is available, otherwise use actual price
-      const price = item.discountPrice || item.actualPrice;
-
-      // Calculate amount based on ordered quantity
-      const itemAmount = price * item.orderedQuantity;
-
-      // Add to the total amount
-      totalAmount += itemAmount;
-    });
-
-    return totalAmount;
-  };
-
   const handleModalPrintBillOpen = () => {
-    const TotalAmount = calculateTotalOrderAmount(selectedItems);
-    setTotalPrice(TotalAmount);
-
     if (totalPrice == 0) {
       toastError("Please select the item from menu!");
     } else {
@@ -133,36 +118,24 @@ const PosMenu = () => {
     }
   };
 
-  // const handleModalPrintBillOpen = () => {
-  //   const totoalpaisa = selectedItems.map(
-  //     (item) => item.discountPrice * item.orderedQuantity
-  //   );
-  //   setTotalPrice(totoalpaisa);
-  //   console.log(totalPrice, "selectedItems");
-  //   if (totalPrice == 0) {
-  //     toastError("Please select the item from menu!");
-  //   } else {
-  //     setModalPrintBill(true);
-  //     setSelectedItems([]);
-  //   }
-  // };
 
   const handleMenuData = async () => {
     try {
-      const Mode = orderData?.orderMode
-        ? orderData?.orderMode
-        : HoldMenu.orderMode;
-
-      console.log(Mode, "i am hold");
-      const { data } = await GetMenuDataAtPos(Mode);
-      console.log(data, "i am dataaa");
+      const Mode = orderData?.orderMode ? orderData?.orderMode : HoldMenu.orderMode
+      
+      console.log(Mode, "i am hold"); 
+      const { data } = await GetMenuDataAtPos(Mode);  
+console.log(data,"i am dataaa");
       if (data.success) {
+
         if (data.CategoryData) {
           setMenuCategories(data.CategoryData);
         }
         setSelectedCategory("All");
-        console.log(data.MenuData, "i am data.menudata");
-        setCurrentMenu(data.MenuData);
+console.log(data.MenuData,"i am data.menudata");
+        setCurrentMenu(data.MenuData)
+
+        
       } else {
         // Display error toast
         toastError(data.message);
@@ -178,9 +151,7 @@ const PosMenu = () => {
   };
 
   useEffect(() => {
-    setOrderMode(
-      orderData?.orderMode ? orderData?.orderMode : HoldMenu.orderMode
-    );
+    setOrderMode(orderData?.orderMode ? orderData?.orderMode : HoldMenu.orderMode)
 
     handleMenuData();
     handleCategoryChange({ target: { value: "all" } });
@@ -188,16 +159,18 @@ const PosMenu = () => {
 
   const handleHoldSubmit = async () => {
     try {
+
+
       const dataToPass = {
         orderData: orderData,
         TotalPrice: totalPrice,
         kotData: selectedItems,
         orderId,
       };
-
+      
       console.log(dataToPass, "data to pass");
       // if (orderId &&orderData) {
-
+        
       //   const response = await HoldItemsAtPos(dataToPass);
 
       //   if (response.data.success) {
@@ -217,7 +190,7 @@ const PosMenu = () => {
         if (orderData) {
           // Both orderId and orderData exist, call the API
           const response = await HoldItemsAtPos(dataToPass);
-
+      
           if (response.data.success) {
             navigate("/pos-dashboard");
             toastSuccess(response.data.message);
@@ -235,7 +208,22 @@ const PosMenu = () => {
       console.log(error);
     }
   };
+  const calculateTotalOrderAmount = (selectedItems) => {
+    let totalAmount = 0;
 
+    selectedItems.forEach((item) => {
+      // Check if discount price is available, otherwise use actual price
+      const price = item.discountPrice || item.actualPrice;
+
+      // Calculate amount based on ordered quantity
+      const itemAmount = price * item.orderedQuantity;
+
+      // Add to the total amount
+      totalAmount += itemAmount;
+    });
+
+    return totalAmount;
+  };
   const handleOrderSubmit = async () => {
     try {
       // setUploading(true);
@@ -244,6 +232,14 @@ const PosMenu = () => {
         selectedItems.filter((item) => item.quantity > 0)
       );
 
+     
+
+      // selectedItems.map((item) => {
+      //   if (item.orderedQuantity > 0) {
+      //   }
+      // });
+
+
       const data = {
         orderData: orderData,
         TotalPrice: TotalAmount,
@@ -251,7 +247,8 @@ const PosMenu = () => {
         HoldMenu: HoldMenu ? HoldMenu : "",
       };
 
-      console.log(data, "i am dataaaaaaaa ");
+
+      console.log(data,"i am dataaaaaaaa ");
 
       localStorage.removeItem("selectedItems");
 
@@ -260,18 +257,22 @@ const PosMenu = () => {
       });
 
       const response = await KotOrder(data);
-      console.log(response, orderData, "i ma response from kot submit");
+      console.log(response,orderData,"i ma response from kot submit");
       setUploading(false);
-      setKotId(response.data.orderId);
+
       if (response.data.success) {
         setModalKot(false);
 
         toastSuccess(response.data.message);
         // orderData.orderMode === "takeaway" ||
-        if (response.data.orderId) {
+        if ( response.data.orderId) {
+        
           setOrderId(response.data.orderId);
+        
         } else {
+
           navigate("/pos-dashboard");
+
         }
       } else {
         toastError(response.data.message);
@@ -281,13 +282,15 @@ const PosMenu = () => {
     }
   };
 
+
   const handlePrindbill = async () => {
     try {
+      
       console.log();
     } catch (err) {
       console.log(err);
     }
-  };
+  }
 
   return (
     <Wrapper className="page">
@@ -332,7 +335,7 @@ const PosMenu = () => {
                 <option disabled value="">
                   Sort by price
                 </option>
-
+              
                 <option value="low to high">Low to high</option>
                 <option value="high to low">High to low</option>
               </select>
@@ -368,17 +371,16 @@ const PosMenu = () => {
         </div>
 
         <div className="modal-buttons">
-          {orderMode === "takeaway" && (
-            <button
-              type="button"
-              onClick={() => handleHoldSubmit()}
-              className="modal-btn"
-              // hidden={orderData && orderData.orderMode == "online"}
-            >
-              {" "}
-              Hold{" "}
-            </button>
-          )}
+
+{orderMode === 'takeaway' &&  (    <button
+            type="button"
+            onClick={() => handleHoldSubmit()}
+            className="modal-btn"
+            // hidden={orderData && orderData.orderMode == "online"}
+          >
+            {" "}
+            Hold{" "}
+          </button>)}
 
           <button
             onClick={handleModalKotOpen}
@@ -388,20 +390,25 @@ const PosMenu = () => {
             {" "}
             KOT{" "}
           </button>
-          {orderMode === "takeaway" && (
-            <button
-              type="button"
-              onClick={() => handleModalPrintBillOpen()}
-              className="modal-btn"
-              // hidden={orderData && orderData.orderMode == "online"}
-            >
-              {" "}
-              Print Bill{" "}
-            </button>
-          )}
+{orderMode === 'takeaway' &&  (    <button
+            type="button"
+            onClick={() => handleModalPrintBillOpen()}
+            className="modal-btn"
+            // hidden={orderData && orderData.orderMode == "online"}
+          >
+            {" "}
+            Print Bill{" "}
+          </button>)}
 
+
+
+          
           <div>
             {isUploading ? <Uploading isUploading={isUploading} /> : null}
+
+            
+
+            
 
             <Wrapper1
               centered
@@ -410,44 +417,40 @@ const PosMenu = () => {
               cancelButtonProps={{ style: { display: "none" } }}
               okButtonProps={{ style: { display: "none" } }}
             >
-              <h4 className="title">
-                KOT : {orderData?.orderMode}
-                (orderId: {orderData?.orderId})
-              </h4>
+              <h4 className="title">Order Summary</h4>
               <div className="form-div">
-                <div className="summary-items">
-                  <div className="heading d-flex justify-content-between">
-                    <p>Item</p>
-                    <p className="quantity">Quantity</p>
-                  </div>
-                  {selectedItems
-                    .concat(HoldMenu ? HoldMenu : [])
-                    .filter((item) => item.orderedQuantity > 0)
-                    .map((item, index) => {
-                      console.log("selectedItems", selectedItems);
-                      return (
-                        <div key={index} className="single-item">
-                          <p>{item.item && item.item}</p>
-                          <p className="quantity">x{item.orderedQuantity}</p>
-                        </div>
-                      );
-                    })}
-                </div>
+  <div className="summary-items">
+    <div className="heading d-flex justify-content-between">
+      <p>Item</p>
+      <p className="quantity">Quantity</p>
+    </div>
+    {selectedItems
+      .concat(HoldMenu ? HoldMenu : [])
+      .filter((item) => item.orderedQuantity > 0)
+      .map((item, index) => {
+        return (
+          <div key={index} className="single-item">
+            <p>{item.item && item.item}</p>
+            <p className="quantity">x{item.orderedQuantity}</p>
+          </div>
+        );
+      })}
+  </div>
 
-                <div className="total"></div>
+  <div className="total"></div>
 
-                <div className="form-btn">
-                  <button onClick={handleOrderSubmit}>
-                    <IoMdPrint
-                      style={{ marginRight: "10px", fontSize: "20px" }}
-                    />
-                    KOT Print
-                  </button>
-                </div>
-              </div>
+  <div className="form-btn">
+    <button onClick={handleOrderSubmit}>
+      <IoMdPrint style={{ marginRight: "10px", fontSize: "20px" }} />
+      KOT Print
+    </button>
+  </div>
+</div>
             </Wrapper1>
+
           </div>
 
+          
           <PrintBillModal
             open={modalPrintBill}
             onCancel={() => setModalPrintBill(false)}
@@ -455,23 +458,12 @@ const PosMenu = () => {
             okButtonProps={{ style: { display: "none" } }}
             printBillData={selectedItems}
             TotalPrice={totalPrice}
-            billid={selectedItems?._id}
             kotId={kotId}
-            // orderData={orderData}
+            orderData={orderData}
           />
 
-          {/* <TakeAwaySummeryModal
-            // key={selectedItem._id}
-            open={modalPrintBill}
-            onCancel={() => setModalPrintBill(false)}
-            cancelButtonProps={{ style: { display: "none" } }}
-            okButtonProps={{ style: { display: "none" } }}
-            // kotItems={
-            //   takeAway.find((val) => val._id === selectedItemId)
-            //     ?.KotItems || []
-            // }
-            selectedOrder={selectedItems}
-          /> */}
+          
+          
         </div>
       </div>
     </Wrapper>

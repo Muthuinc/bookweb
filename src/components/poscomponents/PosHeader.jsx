@@ -81,7 +81,7 @@ const PosHeader = ({ openSidebar }) => {
 
         <div className="profile">
           <div className="profile-div" onClick={handleImageClick}>
-            <img src={manager?.profileImage && manager?.profileImage} alt="aassd" />
+            <img src={manager.profileImage && manager.profileImage} alt="" />
           </div>
 
           {/* Hidden file input */}

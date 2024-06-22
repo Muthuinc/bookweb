@@ -11,43 +11,38 @@ import {
 import Uploading from "../loaders/Uploading";
 import { floorNumber, toastSuccess } from "../../helpers/helpers";
 
-const MenuCard = ({
-  handleToggleChange,
-  updateQuantity,
-  onDelete,
-  ...data
-}) => {
+const MenuCard = ({ handleToggleChange, updateQuantity, onDelete, ...data }) => {
   const [count, setCount] = useState(data.quantity);
   const [isUploading, setUploading] = useState(false);
 
   const navigate = useNavigate();
   // console.log(props,"ui am oproppp");
-  console.log(data.plateform, "plateform");
+  console.log(data.plateform,"plateform");
 
   const handleToggleChangefn = async () => {
     try {
       // console.log(props,"i am props");
       const updatedIsShared = !data.toggleState;
 
-      handleToggleChange(data.itemId);
-      const response = await UpdateMenuActive(
-        data.itemId,
-        updatedIsShared,
-        data.plateform
-      );
+handleToggleChange(data.itemId);
+      const response = await UpdateMenuActive(data.itemId, updatedIsShared,data.plateform);
 
       if (!response.success) {
         handleToggleChange(data.itemId);
         console.error("Failed to update isShared property");
       }
+
     } catch (error) {
+
       console.error("Error updating menu:", error);
+      
     }
   };
 
   const stock = 30;
 
   const increase = async () => {
+
     setCount((currentState) => {
       if (currentState < stock) {
         (async () => {
@@ -55,10 +50,12 @@ const MenuCard = ({
             quantityStatus: "increment",
             ItemId: data.itemId,
             count: count + 1,
-            plateform: data.plateform,
+            plateform:data.plateform
           };
 
           const response = await quantityIncrementAtMenu(Data);
+
+
         })();
         const newState = currentState + 1;
         return newState;
@@ -68,6 +65,8 @@ const MenuCard = ({
   };
 
   const decrease = () => {
+    
+
     setCount((currentState) => {
       if (currentState > 0) {
         (async () => {
@@ -75,9 +74,11 @@ const MenuCard = ({
             quantityStatus: "decrement",
             ItemId: data.itemId,
             count: count - 1,
-            plateform: data.plateform,
+            plateform:data.plateform
           };
           const response = await quantityIncrementAtMenu(Data);
+       
+
         })();
         const newState = currentState - 1;
         return newState;
@@ -86,13 +87,14 @@ const MenuCard = ({
     });
   };
 
-  const handleMenuDrop = async (menuId, plateform) => {
+  const handleMenuDrop = async (menuId,plateform) => {
     try {
       console.log("calledddd delete");
-      const response = await DeleteMenu(menuId, plateform);
+      const response = await DeleteMenu(menuId,plateform);
       onDelete();
 
-      toastSuccess(response.data.message);
+    
+      toastSuccess(response.data.message)
     } catch (error) {
       console.log(error);
       // toast.success(response.data.message);
@@ -105,99 +107,93 @@ const MenuCard = ({
 
   return (
     <>
-      {isUploading ? <Uploading isUploading={isUploading} /> : null}
-
-      <Wrapper>
-        <div className="card">
-          {data.discount && (
-            <span className="percentage">
-              {floorNumber(data.discountPerc)}%
-            </span>
+    { isUploading ?(<Uploading isUploading={isUploading}/>):null}
+      
+    <Wrapper>
+      <div className="card">
+        {data.discount && (
+          <span className="percentage">{floorNumber( data.discountPerc)}%</span>
           )}
-          <div className="toggle-edits-div">
-            <div className="toggle-switch-div">
-              <label className="switch">
-                <input
-                  type="checkbox"
-                  checked={data.toggleState}
-                  onChange={handleToggleChangefn}
+        <div className="toggle-edits-div">
+          <div className="toggle-switch-div">
+            <label className="switch">
+              <input
+                type="checkbox"
+                checked={data.toggleState}
+                onChange={handleToggleChangefn}
                 />
-                <span className="slider toggle-btn" />
-              </label>
-            </div>
+              <span className="slider toggle-btn" />
+            </label>
+          </div>
 
             <div className="delete-edit">
-              {/* <span className="action-icon edit-icon"> */}
-              <Link
-                className="action-icon edit-icon"
-                to={`/dashboard/menu-management/update-menu-item/${data.itemId}`}
-                state={{ Item: data }}
-              >
-                <MdEdit
+            {/* <span className="action-icon edit-icon"> */}
+              <Link className="action-icon edit-icon" to={`/dashboard/menu-management/update-menu-item/${data.itemId}`} state={{Item:data}}>
+              <MdEdit
                 // onClick={() => {
                 //     handleEditMenu(props.itemId);
                 //   }}
-                />
-              </Link>
-              {/* </span> */}
-
-              {data.plateform && (
-                <span className="action-icon delete-icon">
-                  <MdDelete
-                    onClick={() => {
-                      handleMenuDrop(data.itemId, data.plateform);
-                    }}
-                    style={{ cursor: "pointer" }}
                   />
-                </span>
-              )}
-            </div>
+                  </Link>
+              {/* </span> */}
+              
+              {data.plateform === "Restaurant" && (<span className="action-icon delete-icon">
+                
+              <MdDelete
+                onClick={() => {
+                  handleMenuDrop(data.itemId,data.plateform);
+                }}
+                style={{ cursor: "pointer" }}
+                />
+              </span>)}
+              
+          </div>
+        </div>
+
+        <div className="card-body">
+          <div className="card-img">
+            <img src={data.img} alt="" />
           </div>
 
-          <div className="card-body">
-            <div className="card-img">
-              <img src={data.img} alt="" />
-            </div>
+          <div className="card-content">
+            <h5 className="truncate">{data.title}</h5>
+            <p className="truncate">{data.desc}</p>
+            <div className="card-buttons">
+              <div className="price-div">
+                <div>
+                  {data.discount && (
+                    <h5 className="discount">
+                      <MdCurrencyRupee />
+                      {data.originalPrice}
+                    </h5>
+                  )}
+                </div>
 
-            <div className="card-content">
-              <h5 className="truncate">{data.title}</h5>
-              <p className="truncate">{data.desc}</p>
-              <div className="card-buttons">
-                <div className="price-div">
-                  <div>
-                    {data.discount && (
-                      <h5 className="discount">
-                        <MdCurrencyRupee />
-                        {data.originalPrice}
-                      </h5>
-                    )}
-                  </div>
-
-                  <div>
-                    {data.discount ? (
-                      <h5>
-                        <MdCurrencyRupee />
-                        {data.discount}
-                      </h5>
-                    ) : (
-                      <h5 className="py-2">
-                        <MdCurrencyRupee />
-                        {data.originalPrice}
-                      </h5>
-                    )}
-                  </div>
+                <div>
+                  {data.discount ? (
+                    <h5>
+                      <MdCurrencyRupee />
+                      {data.discount}
+                    </h5>
+                  ) : (
+                    <h5 className="py-2">
+                      <MdCurrencyRupee />
+                      {data.originalPrice}
+                    </h5>
+                  )}
                 </div>
               </div>
             </div>
+          </div>
 
-            <div className="quantity">
-              <div>
-                <p>Quantity</p>
-              </div>
+          <div className="quantity">
+            <div>
+              <p>Quantity</p>
+            </div>
               <div className="count">
                 <p>{count}</p>
               </div>
-              {/* <div className="count-div">
+            {/* <div className="count-div">
               <div className="decrease" onClick={decrease}>
                 <FaMinus />
               </div>
@@ -205,11 +201,11 @@ const MenuCard = ({
                 <FaPlus />
               </div>
             </div> */}
-            </div>
           </div>
         </div>
-      </Wrapper>
-    </>
+      </div>
+    </Wrapper>
+                  </>
   );
 };
 

@@ -262,7 +262,6 @@ const Passbook = () => {
         const { data } = await getAllRegisteredPos();
 
         if (data.success) {
-          console.log("first",data)
           setRegisteredPosManagers(data.RegisteredPosManagers);
         } else {
           toastError(data.message);

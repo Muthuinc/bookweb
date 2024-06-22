@@ -8,7 +8,7 @@ import { useForm } from "react-hook-form";
 import Uploading from "../../../components/loaders/Uploading";
 import { toastError, toastSuccess } from "../../../helpers/helpers";
 import { GetClosingFieldData } from "../../../config/routeApi/pos";
-import { Image } from "antd";
+import { Image } from 'antd';
 
 const PosAddTodaysClosing = () => {
   const navigate = useNavigate();
@@ -22,7 +22,6 @@ const PosAddTodaysClosing = () => {
   const [image, setImage] = useState(null);
   const [isUploading, setUploading] = useState(false);
   const [aadhaarImagePreview, setAadharImagePreview] = useState([]);
-  const [totalCashReceived, setTotalCashReceived] = useState(0); // State for total cash received
 
   const handleImage = (e) => {
     const images = e.target.files;
@@ -30,25 +29,24 @@ const PosAddTodaysClosing = () => {
     if (images) {
       setImage(images);
       const previews = [];
-
+  
       Array.from(images).forEach((image) => {
         const reader = new FileReader();
-
+  
         reader.onload = function (e) {
           previews.push(e.target.result);
-
+  
           // Check if all images have been processed
           if (previews.length === images.length) {
             setAadharImagePreview(previews);
           }
         };
-
+  
         reader.readAsDataURL(image);
       });
     }
   };
 
-  
   const currentDate = new Date().toISOString().split("T")[0];
 
   const handleSubmitButton = async (data) => {
@@ -56,19 +54,11 @@ const PosAddTodaysClosing = () => {
 
     const formData = new FormData();
 
-    const {
-      Totalorder,
-      date,
-      totalAmount,
-      totalAmountBromagOrders,
-      totalAmountOthersOrder,
-      totalAmountSwiggyOrder,
-      totalAmountZomatoOrder,
-      totalamounttakeaway,
-      totalorderupi,
-    } = data;
+    const { Totalorder, date, totalAmount, totalAmountBromagOrders, totalAmountOthersOrder, totalAmountSwiggyOrder, totalAmountZomatoOrder, totalamounttakeaway, totalorderupi } = data;
 
+   
     for (let i = 0; i < image.length; i++) {
+      
       formData.append("image", image[i]);
     }
 
@@ -104,6 +94,8 @@ const PosAddTodaysClosing = () => {
     } else {
       toastError(response.data.message);
     }
+
+
   };
 
   const denominations = [
@@ -139,6 +131,7 @@ const PosAddTodaysClosing = () => {
     async function getFieldData() {
       const { data } = await GetClosingFieldData();
 
+
       const {
         message,
         success,
@@ -148,31 +141,34 @@ const PosAddTodaysClosing = () => {
         todaysTotalAmountOthersOrders,
         todaysTotalAmountSwiggyOrders,
         todaysTotalAmountTakeAway,
-        
         todaysTotalAmountZomatoOrders,
         todaysTotalOrderdsInUPI,
         todaysTotalOrders,
-        todaysTotalOrderdsInCASH,
-        todaysTotalOrderdsInCARD,
-        todaysTotalOrderdsInCREDIT
-        
       } = data;
 
+
+
+
       console.log(data, "heloooo resposne");
-      setValue("Totalorder", todaysTotalOrders);
-      setValue("totalAmount", todaysTotalAmount);
-      setValue("totalAmountSwiggyOrder", todaysTotalAmountSwiggyOrders);
-      setValue("totalAmountZomatoOrder", todaysTotalAmountZomatoOrders);
-      setValue("totalAmountBromagOrders", todaysTotalAmountBromagOrders);
-      setValue("totalamounttakeaway", todaysTotalAmountTakeAway);
-      setValue("todaysTotalAmountDineIn", todaysTotalAmountDineIn);
-      setValue("totalAmountOthersOrder", todaysTotalAmountOthersOrders);
-      setValue("totalorderupi", todaysTotalOrderdsInUPI);
-      setValue("totalordercash", todaysTotalOrderdsInCASH);
-      setValue("totalordercard", todaysTotalOrderdsInCARD);
-      setValue("totalordercredit", todaysTotalOrderdsInCREDIT);
-     
-      
+      setValue( "Totalorder",todaysTotalOrders);
+      setValue("totalAmount",todaysTotalAmount);
+      setValue("totalAmountSwiggyOrder",todaysTotalAmountSwiggyOrders);
+      setValue("totalAmountZomatoOrder",todaysTotalAmountZomatoOrders);
+      setValue("totalAmountBromagOrders",todaysTotalAmountBromagOrders);
+      setValue("totalamounttakeaway",todaysTotalAmountTakeAway);
+      setValue("totalAmountOthersOrder",todaysTotalAmountOthersOrders);
+      setValue("totalorderupi",todaysTotalOrderdsInUPI);
+
+
+
+      // setValue(
+      //   "totalamountdinein",
+      //   data.todaysTotalAmountDineIn[0]
+      //     ? data.todaysTotalAmountDineIn[0].totalAmountDineIn
+      //     : 0
+      // );
+
+    
     }
 
     getFieldData();
@@ -184,16 +180,6 @@ const PosAddTodaysClosing = () => {
       count: denominationCounts[denomination.label] || 0,
     }));
   };
-  // Function to calculate total cash received
-  useEffect(() => {
-    let total = 0;
-    denominations.forEach((denomination) => {
-      total +=
-        denomination.value * (denominationCounts[denomination.label] || 0);
-    });
-    setTotalCashReceived(total);
-  }, [denominationCounts]);
-
 
   const [completeDenominationState, setCompleteDenominationState] = useState(
     completeDenomination()
@@ -224,7 +210,6 @@ const PosAddTodaysClosing = () => {
                     type="date"
                     id="date"
                     defaultValue={currentDate}
-                    readOnly
                   />
 
                   {errors.date && errors.date.type === "required" && (
@@ -288,14 +273,13 @@ const PosAddTodaysClosing = () => {
                     type="number"
                     placeholder="Enter Total Amount In Online Orders"
                   />
+                  
                 </div>
               </div>
-
               <div className="form-input-row">
                 <div className="form-input">
                   <label>
-                    Total Amount - Bromag Orders
-                    <span className="text-danger">*</span>
+                  Total Amount - Bromag Orders<span className="text-danger">*</span>
                   </label>
                   <br />
                   <input
@@ -325,11 +309,13 @@ const PosAddTodaysClosing = () => {
                     type="number"
                     placeholder="Enter Total Amount In Online Orders"
                   />
+                  
                 </div>
               </div>
 
               <div className="form-input-row">
-                <div className="form-input">
+               
+              <div className="form-input">
                   <label>
                     Total Amount - Others Orders
                     <span className="text-danger">*</span>
@@ -342,7 +328,12 @@ const PosAddTodaysClosing = () => {
                     type="number"
                     placeholder="Enter Total Amount In Online Orders"
                   />
+                  
                 </div>
+
+
+
+
               </div>
               <div className="form-input-row">
                 <div className="form-input">
@@ -358,24 +349,10 @@ const PosAddTodaysClosing = () => {
                     type="number"
                     placeholder="Enter Total Amount In Take Away"
                   />
+                
                 </div>
-              </div>
-              {/* Display the dine orders  */}
-              <div className="form-input-row">
-                <div className="form-input">
-                  <label>
-                    Total Amount - Dine
-                    <span className="text-danger">*</span>
-                  </label>
-                  <br />
 
-                  <input
-                    disabled
-                    {...register("totalamountdine", { required: true })}
-                    type="number"
-                    placeholder="Enter Total Amount In Dine"
-                  />
-                </div>
+               
               </div>
 
               <div className="form-input-row">
@@ -444,127 +421,29 @@ const PosAddTodaysClosing = () => {
                   ))}
                 </div>
               </div>
-              
-                              {/* Display total cash received */}
-                              <div className="col-md-3">
-          <div className="form-input-row">
-            <div className="form-input-full">
-              <label>Total Cash Received:</label>
-              <span>{totalCashReceived}</span>
-            </div>
-          </div>
-        </div>
 
+              <label style={{ fontWeight: "700" }}>UPI Payments</label>
 
-              <div className="lg-col{6}">
-                <div className="row">
-                  <div className="col-lg-3">
-                    <label style={{ fontWeight: "700" }}>Cash Payments</label>
+              <div className="form-input-row">
+                <div className="form-input-full">
+                  <label>
+                    Total Amount<span className="text-danger">*</span>
+                  </label>
+                  <br />
+                  <div>
+                    <input
+                      disabled
+                      {...register("totalorderupi", { required: true })}
+                      type="text"
+                      placeholder="Enter Total Orders"
+                    />
 
-                    <div className="form-input-row">
-                      <div className="form-input-full">
-                        <label>
-                          Total Amount<span className="text-danger">*</span>
+                    {errors.totalorderupi &&
+                      errors.totalorderupi.type === "required" && (
+                        <label className="error-msg text-danger">
+                          Please enter total order
                         </label>
-                        <br />
-                        <div>
-                          <input
-                            disabled
-                            {...register("totalordercash", { required: true })}
-                            type="text"
-                            placeholder="Enter Total Orders"
-                          />
-
-                          {errors.totalordercash &&
-                            errors.totalordercash.type === "required" && (
-                              <label className="error-msg text-danger">
-                                Please enter total order
-                              </label>
-                            )}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="col-lg-3">
-                    <label style={{ fontWeight: "700" }}>Card Payments</label>
-
-                    <div className="form-input-row">
-                      <div className="form-input-full">
-                        <label>
-                          Total Amount<span className="text-danger">*</span>
-                        </label>
-                        <br />
-                        <div>
-                          <input
-                            disabled
-                            {...register("totalordercard", { required: true })}
-                            type="text"
-                            placeholder="Enter Total Orders"
-                          />
-
-                          {errors.totalordercard &&
-                            errors.totalordercard.type === "required" && (
-                              <label className="error-msg text-danger">
-                                Please enter total order
-                              </label>
-                            )}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="col-lg-3">
-                    <label style={{ fontWeight: "700" }}>Credit Payments</label>
-
-                    <div className="form-input-row">
-                      <div className="form-input-full">
-                        <label>
-                          Total Amount<span className="text-danger">*</span>
-                        </label>
-                        <br />
-                        <div>
-                          <input
-                            disabled
-                            {...register("totalordercredit", { required: true })}
-                            type="text"
-                            placeholder="Enter Total Orders"
-                          />
-
-                          {errors.totalordercredit &&
-                            errors.totalordercredit.type === "required" && (
-                              <label className="error-msg text-danger">
-                                Please enter total order
-                              </label>
-                            )}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="col-lg-3">
-                    <label style={{ fontWeight: "700" }}>UPI Payments</label>
-
-                    <div className="form-input-row">
-                      <div className="form-input-full">
-                        <label>
-                          Total Amount<span className="text-danger">*</span>
-                        </label>
-                        <br />
-                        <div>
-                          <input
-                            disabled
-                            {...register("totalorderupi", { required: true })}
-                            type="text"
-                            placeholder="Enter Total Orders"
-                          />
-
-                          {errors.totalorderupi &&
-                            errors.totalorderupi.type === "required" && (
-                              <label className="error-msg text-danger">
-                                Please enter total order
-                              </label>
-                            )}
-                        </div>
-                      </div>
-                    </div>
+                      )}
                   </div>
                 </div>
               </div>
@@ -601,11 +480,13 @@ const PosAddTodaysClosing = () => {
               </div>
 
               <div className="col-md-5 mt-3 d-flex flex-wrap gap-3">
-                {aadhaarImagePreview &&
-                  aadhaarImagePreview.map((image, index) => (
-                    <Image key={index} width={200} src={image} />
-                  ))}
-              </div>
+              
+            {aadhaarImagePreview && aadhaarImagePreview.map((image, index) => (
+                <Image key={index} width={200} src={image} />
+
+              
+              ))}
+</div>
 
               <div className="buttons">
                 <Button className="submit-btn" type="submit">

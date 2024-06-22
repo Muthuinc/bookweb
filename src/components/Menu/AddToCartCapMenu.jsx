@@ -133,7 +133,7 @@ const AddToCartCapMenu = ({
   // Constants
 
 
-  const productStock =1000;
+  const productStock = 12;
 
   // Decrease quantity handler
   const setDecrease = (itemId) => {
@@ -230,7 +230,7 @@ const AddToCartCapMenu = ({
               </div>
 
               <div className="count-div">
-                <div className="quantity">quantity </div>
+                <div className="quantity">quantity</div>
                 <div className="increase-decrease-div">
                   <button
                     className="decrease"
